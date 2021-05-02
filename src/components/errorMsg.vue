@@ -39,6 +39,7 @@ export default {
 
 <style scoped>
 #error-msg {
+  font-family: Arial, Helvetica, sans-serif;
   position: absolute;
   height: 2rem;
   top: 6rem;

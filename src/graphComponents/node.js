@@ -186,6 +186,12 @@ export class Node{
 
   unselectSelf() {
     this.component.setAttribute("fill", this.fillColor);
+    this.component.setAttribute("stroke", this.fillColor);
+  }
+
+  highlightSelf() {
+    this.component.setAttribute("fill", "#E74C3C");
+    this.component.setAttribute("stroke", "#E74C3C");
   }
 
   //reset

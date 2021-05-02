@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import { solveforwardpath } from "../../solvingAlgo/forward_paths.js";
 import { findLoops } from "../../solvingAlgo/loops.js";
 import { transferFunction } from "../../solvingAlgo/Transfer_ function.js";
@@ -17,10 +17,12 @@ export default {
       nodeNum: 0,
     }
   },
-  computed: mapGetters(['nodes']),
+  computed: mapGetters(['nodes', 'getErrorCard']),
   methods: {
+    ...mapActions(['setErrorMsg']),
     triggerSolve() {
-      // const graphInfo = this.getGraphInfo();
+      if(!this.isValidGraph()) return;
+      const graphInfo = this.getGraphInfo();
       // const graphInfo =  [[0,1,0,0,1,0,0,1,0],
       //                     [0,0,1,0,0,0,1,0,1],
       //                     [1,1,0,1,0,1,0,0,0],
@@ -30,8 +32,6 @@ export default {
       //                     [0,0,0,0,0,0,0,0,0],
       //                     [0,0,0,0,0,0,0,0,1],
       //                     [0,0,0,0,0,0,0,1,0]];
-
-      const graphInfo = this.getGraphInfo();
 
       this.nodeNum = graphInfo.length;
 
@@ -48,8 +48,6 @@ export default {
       // }
 
       const computations = transferFunction(forwardPaths, loops);
-      console.log(forwardPaths);
-      console.log(loops);
 
       this.openSolutionArea();
       this.showSolution(forwardPaths, loops, computations);
@@ -88,14 +86,14 @@ export default {
 
       let pathIndex = 1;
       for(let path of forwardPaths.paths) {
-        this.addPath(path, pathIndex++);
+        this.addPath(path, pathIndex++, forwardPaths.gains[pathIndex -2]);
       }
 
       this.addTitle("Loops :");
 
       let loopIndex = 1;
       for(let loop of graphLoops.loops) {
-        this.addLoop(loop, loopIndex++);
+        this.addLoop(loop, loopIndex++, graphLoops.gains[loopIndex -2]);
       }
 
       this.addTitle("Transfer function :");
@@ -108,6 +106,8 @@ export default {
 
       this.addFormula(computations.transferFunction);
       this.RenderLatex();
+
+      this.unhighlightAll();
     },
     addTitle(titleText){
       const title = document.createElement('div');
@@ -115,8 +115,9 @@ export default {
       title.className = "solve-title";
       document.getElementById("steps").appendChild(title);
     },
-    addPath(pathSeq, pathIndex) {
+    addPath(pathSeq, pathIndex, pathGain) {
       const n = pathSeq.length;
+      let pathContainer = document.createElement('div');
       let path = document.createElement('div');
       path.innerHTML = `$$P_${pathIndex} :`;
 
@@ -124,12 +125,25 @@ export default {
         path.innerHTML += `${this._getNodeIndex(pathSeq[i])} \\xrightarrow{}`;
       }
       path.innerHTML += `${this._getNodeIndex(pathSeq[n-1])}$$`;
+      path.className = "path";
 
-      path.className = "solution-info";
-      document.getElementById("steps").appendChild(path);
+      let gain = document.createElement('div');
+      gain.innerHTML = `$$P_${pathIndex} = ${pathGain}$$`;
+      gain.className = "gain";
+
+      pathContainer.appendChild(path);
+      pathContainer.appendChild(gain);
+
+      pathContainer.className = "solution-info";
+
+      pathContainer.onmouseover = () => this.highlightSequence(pathSeq);
+      pathContainer.onmouseleave = () => this.unhighlightAll();
+
+      document.getElementById("steps").appendChild(pathContainer);
     },
-    addLoop(loopSeq, loopIndex) {
+    addLoop(loopSeq, loopIndex, loopGain) {
       const n = loopSeq.length;
+      let loopContainer = document.createElement('div');
       let loop = document.createElement('div');
       loop.innerHTML = `$$L_${loopIndex}: `;
 
@@ -137,9 +151,21 @@ export default {
         loop.innerHTML += `${this._getNodeIndex(loopSeq[i])} \\xrightarrow{}`;
       }
       loop.innerHTML += `${this._getNodeIndex(loopSeq[n-1])}$$`;
+      loop.className = "loop";
 
-      loop.className = "solution-info";
-      document.getElementById("steps").appendChild(loop);
+      let gain = document.createElement('div');
+      gain.innerHTML = `$$L_${loopIndex} = ${loopGain}$$`;
+      gain.className = "gain";
+
+      loopContainer.appendChild(loop);
+      loopContainer.appendChild(gain);
+
+      loopContainer.className = "solution-info";
+
+      loopContainer.onmouseover = () => this.highlightSequence(loopSeq);
+      loopContainer.onmouseleave = () => this.unhighlightAll();
+
+      document.getElementById("steps").appendChild(loopContainer);
     },
     addDelta(deltaValue, deltaIndex, addSubIndex = true) {
       let delta = document.createElement('div');
@@ -158,7 +184,7 @@ export default {
     _getNodeIndex(nodeCode) {
       let nodeIndex = "";
       if(nodeCode == 0) nodeIndex = "R";
-      else if(nodeCode == this.nodeNum-1) nodeIndex = "C";
+      else if(nodeCode == this.nodeNum -1) nodeIndex = "C";
       else nodeIndex = nodeCode;
 
       return nodeIndex;
@@ -171,6 +197,61 @@ export default {
     RenderLatex() {
       if(window.MathJax) {
         window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub]);
+      }
+    },
+    isValidGraph() {
+      // any node must have exactly at least one output and at least one input
+      for(let node of this.nodes.values()) {
+        if(!node.isInputNode && node.fromConnectionPoint.inConnectors.size == 0) {
+          this.setErrorMsg(`Node ${node.code} has no input branches`);
+          this.getErrorCard.showErrorMsg();
+          return false;
+        }
+
+        if(!node.isOutputNode && node.toConnectionPoint.outConnectors.size == 0) {
+          this.setErrorMsg(`Node ${node.code} has no output brances`);
+          this.getErrorCard.showErrorMsg();
+          return false;
+        }
+      }
+
+      return true;
+    },
+    highlightSequence(sequence) {
+      let seq = [...sequence];
+      for(let nodeCode of sequence) {
+        for(let node of this.nodes.values()) {
+          if(this._getNodeCode(node) == nodeCode) {
+            node.highlightSelf();
+            node.fromConnectionPoint.highlightSelf();
+            node.toConnectionPoint.highlightSelf();
+
+            seq.shift();
+
+            for(let branch of node.toConnectionPoint.outConnectors.values()) {
+              if(seq.includes(this._getNodeCode(branch.to))) branch.highlightSelf();
+            }
+          }
+        }
+      }
+    },
+    _getNodeCode(node) {
+      let nodeCode = 0;
+      if(node.isInputNode) nodeCode = 0;
+      else if(node.isOutputNode) nodeCode = this.nodeNum -1;
+      else nodeCode = node.code;
+
+      return nodeCode;
+    },
+    unhighlightAll() {
+      for(let node of this.nodes.values()) {
+        node.unselectSelf();
+        node.fromConnectionPoint.unselectSelf();
+        node.toConnectionPoint.unselectSelf();
+
+        for(let branch of node.toConnectionPoint.outConnectors.values()) {
+          branch.unselectSelf();
+        }
       }
     }
   },

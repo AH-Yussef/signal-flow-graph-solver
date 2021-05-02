@@ -47,4 +47,12 @@ export class ConnectionPoint {
 
     this.connectionPointWrapper = connectionWrapper;
   }
+
+  highlightSelf() {
+    this.connectionPoint.setAttribute("fill", "#E74C3C");
+  }
+
+  unselectSelf() {
+    this.connectionPoint.setAttribute("fill", "black");
+  }
 }

@@ -19,7 +19,6 @@ const actions = {
 		for(let node of state.nodes.values()){
 			node.resetColor();
 		}
-		// document.getElementById("replay-btn").className = 'hidden'; 
 	},
   clearAllNodess: ({commit}) => commit('clearNodes'),    
 }

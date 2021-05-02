@@ -31,6 +31,7 @@ export default {
 			document.getElementById("sketching-area").style.marginRight = "0rem";
 			document.getElementById("board").style.transform = "scale(1)";
       document.getElementById("board").style.left = "0";
+			document.getElementById("board").style.pointerEvents = 'auto';
 			this.closedMenu = true;
 		},
 	},

@@ -163,6 +163,7 @@ export class Branch {
 
     //removal
     removeSelf(){
+      if(this.gainLabel == null || this.arrow == null || this.branch == null) return;
       this.branch.remove();
       this.arrow.remove();
       this.gainLabel.remove();
@@ -234,6 +235,11 @@ export class Branch {
     _selectSelf() {
       this.branch.setAttribute("stroke", "rgb(30, 89, 202)");
       this.arrow.setAttribute("fill", "rgb(30, 89, 202)");
+    }
+
+    highlightSelf() {
+      this.branch.setAttribute("stroke", "#E74C3C");
+      this.arrow.setAttribute("fill", "#E74C3C");
     }
 
     unselectSelf() {

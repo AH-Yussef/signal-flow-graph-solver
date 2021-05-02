@@ -2,6 +2,7 @@
   <div id="app">
     <div id="sketching-area">
       <appHeader/>
+      <errorMsg/>
       <board/>
     </div>
     <solutionArea/>
@@ -11,6 +12,7 @@
 <script>
 import appHeader from "./components/header.vue";
 import board from "./components/board.vue";
+import errorMsg from "./components/errorMsg.vue";
 import solutionArea from "./components/solutionArea.vue";
 
 export default {
@@ -18,6 +20,7 @@ export default {
   components: {
     appHeader,
     board,
+    errorMsg,
     solutionArea,
   }
 }
@@ -65,12 +68,24 @@ html, body {
 }
 
 .solution-info {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  
 	margin-left: 2rem;
   font-size: normal;
   height: 3rem;
-  line-height: 3rem;
-
+  display: flex;
   overflow-x: auto;
   width: 100%;
+}
+
+.path{
+  width: 70%
+}
+.loop{
+  width: 70%;
+}
+.gain {
+  width: 30%;
 }
 </style>
