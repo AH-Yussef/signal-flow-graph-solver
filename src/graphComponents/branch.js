@@ -62,7 +62,7 @@ export class Branch {
       const width = p2x - p1x;
       let offset = width / 2.5;
       if(p1x > p2x) offset = (width / 2) * -1;
-      if(Math.abs(width) <= (2.5*16)) offset = width * 3;
+      if((-2.5*16) <= width && width <= (-2.2*16)) offset = width * 3;
 
       // location of control point:
       const cx = mpx + offset * Math.cos(theta);
@@ -163,10 +163,16 @@ export class Branch {
 
     //removal
     removeSelf(){
-      if(this.gainLabel == null || this.arrow == null || this.branch == null) return;
       this.branch.remove();
       this.arrow.remove();
       this.gainLabel.remove();
+      if(this.to != null) this.to.fromConnectionPoint.fromComponents.delete(this.from.code);
+      this.from.toConnectionPoint.outConnectors.delete(this.code);
+    }
+
+    cancelHooking() {
+      this.branch.remove();
+      this.arrow.remove();
       if(this.to != null) this.to.fromConnectionPoint.fromComponents.delete(this.from.code);
       this.from.toConnectionPoint.outConnectors.delete(this.code);
     }

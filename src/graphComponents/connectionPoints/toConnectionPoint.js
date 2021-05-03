@@ -70,7 +70,8 @@ export class ToConnectionPoint extends ConnectionPoint{
 
   _removeConnector() {
     if(this.tempConnector == null) return;
-    this.tempConnector.removeSelf();
+    this.tempConnector.cancelHooking();
+    store.dispatch('resetToComponent');
   }
 
   _hookConnector() {
