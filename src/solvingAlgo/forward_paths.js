@@ -12,17 +12,7 @@ export function solveforwardpath(graph){
   const startVertex = 0;
 
   forwarddfs(graph,startVertex);
-
-  // for(let i = 0; i < forwardPaths.length; i++) {
-  //   const path = forwardPaths[i];
-  //   for(let j = 1; j < path.length; j++) {
-  //     if (path[j-1] > path[j]){
-  //       forwardPaths.splice(i, 1);
-  //       break;
-  //     }
-  //   }
-  // } 
-
+  
   return { paths:forwardPaths , gains:forwardGains }
 }
 
