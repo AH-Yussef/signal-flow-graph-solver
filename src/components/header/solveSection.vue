@@ -218,18 +218,18 @@ export default {
       return true;
     },
     highlightSequence(sequence) {
-      let seq = [...sequence];
-      for(let nodeCode of sequence) {
+      let nodeCode = 0;
+      
+      for(let i = 0; i < sequence.length; i++) {
+        nodeCode = sequence[i];
         for(let node of this.nodes.values()) {
           if(this._getNodeCode(node) == nodeCode) {
             node.highlightSelf();
             node.fromConnectionPoint.highlightSelf();
             node.toConnectionPoint.highlightSelf();
 
-            seq.shift();
-
             for(let branch of node.toConnectionPoint.outConnectors.values()) {
-              if(seq.includes(this._getNodeCode(branch.to))) branch.highlightSelf();
+              if((i+1) < sequence.length && this._getNodeCode(branch.to) == sequence[i+1]) branch.highlightSelf();
             }
           }
         }
