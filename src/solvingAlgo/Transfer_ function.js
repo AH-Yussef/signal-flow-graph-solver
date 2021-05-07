@@ -42,7 +42,7 @@ function deltaCalculator(loop, loopGain){
     let currentCombinations = [...loop];
     let currentCombinationsGains = [...loopGain];
 
-    //getting combinations of each independent loop sing
+    //getting all individual non-touching loops combinations
     let sign = -1;
     while(individualsCounter > 0){
         sign *= -1;
@@ -110,15 +110,3 @@ function concatenateNodes(loop1, loop2){
     }
     return nodeArray;
 }
-
-// const loops = {
-//     loop : [[3,4,3], [4,5,4], [6,6], [2,6,5,2], [2,3,4,5,2]],
-//     loopGain : [-10,-4,-1,-20,-100]
-// };
-// const paths = {
-//     path : [[1,2,3,4,5], [1,2,6,5]],
-//     pathGain : [100, 20]
-// }
-
-// console.log("test---------------------");
-// console.log(transferFunction(paths, loops));
