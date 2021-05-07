@@ -92,6 +92,6 @@ export default {
 #steps {
 	width: 100%;
 	overflow-y: auto;
-	height: 100%;
+	height: 90%;
 }
 </style>
