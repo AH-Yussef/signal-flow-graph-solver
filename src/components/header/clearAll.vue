@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { Node } from '../../graphComponents/node.js';
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -21,6 +22,8 @@ export default {
       for(let node of this.nodes.values()){
         node.remove();
       }
+      Node.codeCount = 1;
+      Node.availableCodes.length = 0;
 
       this.resetCurrSelectedComponent();
     }
